@@ -1,6 +1,7 @@
 package at.itkollegimst;
 
 import dataacess.MyDatabaseConnection;
+import ui.Cli;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,6 +18,11 @@ public class Main {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        Cli cli = new Cli();
+
+        cli.start();
+
 
     }
 }
