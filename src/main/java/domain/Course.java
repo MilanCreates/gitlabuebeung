@@ -98,7 +98,6 @@ public class Course extends BaseEntity{
     }
 
     public void setBeginDate(Date beginDate) {
-        System.out.println("Datum2:" + beginDate);
 
         if (beginDate!=null){
 
