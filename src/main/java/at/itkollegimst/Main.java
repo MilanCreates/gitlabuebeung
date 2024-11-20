@@ -1,6 +1,8 @@
 package at.itkollegimst;
 
+import dataacess.MyCourserepository;
 import dataacess.MyDatabaseConnection;
+import dataacess.MySqlRepository;
 import ui.Cli;
 
 import java.sql.Connection;
@@ -9,19 +11,21 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) {
 
+
+
         try {
-            Connection connection = MyDatabaseConnection.getConnection("jdbc:mysql://127.0.0.1:3306/kurssystem","root","");
-
-
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            Cli cli = new Cli(new MySqlRepository() {
+            });
+            cli.start();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Datenbankfehler"+ e.getMessage() + "SQL STAE: " + e.getSQLState());
+        } catch (ClassNotFoundException e) {
+            System.out.println("Datenbankfehler" + e.getMessage());
         }
 
-        Cli cli = new Cli();
 
-        cli.start();
+
+
 
 
     }

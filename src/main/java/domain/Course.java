@@ -14,7 +14,7 @@ public class Course extends BaseEntity{
         return hours;
     }
 
-    public Course(Long id, String name, Date endDate, int hours, Date beginDate, String description, CourseType courseType) throws InvalidValueException {
+    public Course(Long id, String name, String description, int hours, Date beginDate,Date endDate,  CourseType courseType) throws InvalidValueException {
         super(id);
         this.setName(name);
         this.setBeginDate(beginDate);
@@ -115,7 +115,7 @@ public class Course extends BaseEntity{
     @Override
     public String toString() {
         return "Course{" +
-                "id= X" +
+                "id= " + this.getId() + '\'' +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", beginDate=" + beginDate +
