@@ -109,9 +109,10 @@ public class MySqlRepository implements MyCourserepository {
         if (countCoursesInDbWithId(id) ==0){
             return Optional.empty();
         }else {
-            String sql = "select * from courses where id = ?";
+            String sql = "SELECT * FROM `courses` WHERE `id` = ?";
 
             try {
+
                 PreparedStatement preparedStatement = con.prepareStatement(sql);
                 preparedStatement.setLong(1, id);
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -144,7 +145,6 @@ public class MySqlRepository implements MyCourserepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             ArrayList<Course> courseList = new ArrayList<>();
             while (resultSet.next()){
-                Date d = resultSet.getDate("begindate");
 
                 courseList.add(new Course(
 
@@ -167,6 +167,43 @@ public class MySqlRepository implements MyCourserepository {
 
     @Override
     public Optional<Course> update(Course entity) {
+
+        Assert.notNull(entity);
+
+        String sql = "UPDATE `courses` SET `name` = ?, `description` = ?, `begindate` = ?, `enddate` = ? `courstype` = ?  WHERE `courses`.`id` = ?";
+
+        if (countCoursesInDbWithId(entity.getId()) == 0)
+        {
+            return Optional.empty();
+
+
+        }else {
+            try {
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
+                preparedStatement.setString(1, entity.getName());
+                preparedStatement.setString(2,entity.getDescription());
+                preparedStatement.setInt(3,entity.getHours());
+                preparedStatement.setDate(4,entity.getBeginDate());
+                preparedStatement.setDate(5,entity.getEndDate());
+                preparedStatement.setString(6,entity.getCourseType().toString());
+                preparedStatement.setLong(7,entity.getId());
+
+                int affectedRows = preparedStatement.executeUpdate();
+
+                if (affectedRows==0){
+                    return Optional.empty();
+                }else {
+                    return this.getById(entity.getId());
+                }
+
+
+            }catch (MyDatabaseException e){
+                System.out.println(e.getMessage());
+            } catch (SQLException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+
         return Optional.empty();
     }
 
