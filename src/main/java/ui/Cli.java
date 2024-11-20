@@ -45,7 +45,14 @@ public class Cli
                     break;
                 case "4":
 
+
                     updateCourseDetails();
+                    break;
+
+                case "5":
+
+
+                    deleteCours();
                     break;
                 case "x":
                     System.out.println("Beendet");
@@ -58,10 +65,27 @@ public class Cli
         scan.close();
     }
 
+    private void deleteCours() {
+
+        System.out.println("Welchen Kurs löschen ?");
+
+        Long courseIddelete = Long.parseLong(scan.nextLine());
+
+        try {
+            repo.deleteById(courseIddelete);
+        } catch (MyDatabaseException b){
+            throw new MyDatabaseException(b.getMessage());
+        } catch (Exception e){
+
+        }
+    }
+
     private void updateCourseDetails() {
         System.out.println("Für welche Kurs Id update ?");
 
         Long courseId = Long.parseLong(scan.nextLine());
+
+
 
         try {
             Optional<Course> courseOptional = repo.getById(courseId);
@@ -119,7 +143,7 @@ public class Cli
 
             }
 
-        } catch (Exception e) {
+        } catch (MyDatabaseException e) {
             throw new RuntimeException(e);
         }
     }
@@ -192,7 +216,7 @@ public class Cli
             }
 
         }catch (MyDatabaseException e){
-            System.out.println("Datenbankfehler bei Kursdetailanzeige" + e.getMessage());
+            System.out.println("Datenbankfehler bei Kursdetailanzeige : " + e.getMessage());
         }catch (Exception e){
             System.out.println("unbekannter Fehler bei Kursdetailanzeige" + e.getMessage());
         }

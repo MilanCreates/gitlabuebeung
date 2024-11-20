@@ -113,6 +113,7 @@ public class MySqlRepository implements MyCourserepository {
 
             try {
 
+
                 PreparedStatement preparedStatement = con.prepareStatement(sql);
                 preparedStatement.setLong(1, id);
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -209,6 +210,21 @@ public class MySqlRepository implements MyCourserepository {
 
     @Override
     public void deleteById(Long id) {
+
+        Assert.notNull(id);
+
+        String sql = "Delete from `courses` Where `id` = ?";
+        try {
+            if (countCoursesInDbWithId(id) == 0){
+                PreparedStatement preparedStatement = con.prepareStatement(sql);
+                preparedStatement.setLong(1,id);
+                preparedStatement.executeUpdate();
+
+            }
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+
 
     }
 }
