@@ -17,9 +17,10 @@ public class Course extends BaseEntity{
     public Course(Long id, String name, String description, int hours, Date beginDate,Date endDate,  CourseType courseType) throws InvalidValueException {
         super(id);
         this.setName(name);
+        this.setEndDate(endDate);
         this.setBeginDate(beginDate);
         this.setHours(hours);
-        this.setEndDate(endDate);
+
         this.setDescription(description);
         this.setCourseType(courseType);
     }
@@ -27,9 +28,10 @@ public class Course extends BaseEntity{
     public Course(String name, Date endDate, int hours, Date beginDate, String description, CourseType courseType) throws InvalidValueException{
         super(null);
         this.setName(name);
+        this.setEndDate(endDate);
         this.setBeginDate(beginDate);
         this.setHours(hours);
-        this.setEndDate(endDate);
+
         this.setDescription(description);
         this.setCourseType(courseType);
     }
@@ -96,7 +98,10 @@ public class Course extends BaseEntity{
     }
 
     public void setBeginDate(Date beginDate) {
+        System.out.println("Datum2:" + beginDate);
+
         if (beginDate!=null){
+
             if (this.endDate != null){
                 if (beginDate.before(this.endDate)){
 
@@ -106,7 +111,7 @@ public class Course extends BaseEntity{
                 }
             }else
             {
-                throw new InvalidValueException("Startdatum darf nicht null / sein!");
+                throw new InvalidValueException("Enddatum darf nicht null / sein!");
             }
         }
 
