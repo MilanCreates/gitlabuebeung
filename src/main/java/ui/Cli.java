@@ -54,6 +54,14 @@ public class Cli
 
                     deleteCours();
                     break;
+
+                case "6":
+                    courseSearch();
+                    break;
+
+                case "7":
+                    laufendeKurse();
+                    break;
                 case "x":
                     System.out.println("Beendet");
                     break;
@@ -63,6 +71,50 @@ public class Cli
             }
         }
         scan.close();
+    }
+
+    private void laufendeKurse() {
+        System.out.println("laufende Kurse");
+
+        List<Course> list;
+
+        try {
+
+            list = repo.findAllRunningCourses();
+
+            for (Course course : list){
+                System.out.println(course);
+            }
+
+        }catch (MyDatabaseException e){
+            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void courseSearch() {
+        System.out.println("Geben sie einen Suchbegriff an");
+
+        String searchString = scan.nextLine();
+
+        List<Course> courseList;
+
+        try {
+            courseList = repo.findAllCoursesByDescription(searchString);
+
+            for (Course course : courseList){
+                System.out.println(course);
+            }
+
+
+        } catch (MyDatabaseException e) {
+            throw new MyDatabaseException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void deleteCours() {
@@ -197,7 +249,7 @@ public class Cli
         }catch (InvalidValueException a){
             System.out.println("Kursdaten nicht korrekt angegeben" +a.getMessage());
         }catch (MyDatabaseException m){
-            System.out.println("Fehler beim Einfügen" + m.getMessage());
+            System.out.println("Fehler beim Einfügen" + m.getMessage() );
         }catch (Exception e){
             System.out.println(e.getMessage());
         }

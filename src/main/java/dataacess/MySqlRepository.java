@@ -26,8 +26,36 @@ public class MySqlRepository implements MyCourserepository {
     }
 
     @Override
-    public List<Course> findAllCoursesByDescription(String description) {
-        return List.of();
+    public List<Course> findAllCoursesByDescription(String searchText) {
+
+        try {
+            String sql = "Select * from `courses` where lower(`describtion`) like lower(?) or lower(`name`) like lower(?) ";
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            preparedStatement.setString(1,"%" + searchText + "%");
+            preparedStatement.setString(2,"%" + searchText + "%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            ArrayList<Course> courseArrayList = new ArrayList<>();
+            while(resultSet.next()){
+
+                courseArrayList.add(new Course(
+
+                        resultSet.getLong("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("description"),
+                        resultSet.getInt("hours"),
+                        resultSet.getDate("beginDate"),
+                        resultSet.getDate("endDate"),
+                        CourseType.valueOf(resultSet.getString("courseType"))
+                ));
+            }
+
+            return courseArrayList;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -47,6 +75,37 @@ public class MySqlRepository implements MyCourserepository {
 
     @Override
     public List<Course> findAllRunningCourses() {
+        String sql = "Select * from `courses` where now() < `enddate`";
+
+
+
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ArrayList<Course> courses = new ArrayList<>();
+
+            while(resultSet.next()){
+                courses.add( new Course(
+
+                    resultSet.getLong("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("description"),
+                    resultSet.getInt("hours"),
+                    resultSet.getDate("beginDate"),
+                    resultSet.getDate("endDate"),
+                    CourseType.valueOf(resultSet.getString("courseType"))
+                )
+
+                );
+
+            }
+        } catch (MyDatabaseException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
         return List.of();
     }
 
@@ -54,17 +113,16 @@ public class MySqlRepository implements MyCourserepository {
     public Optional<Course> insert(Course entitiy) {
 
         Assert.notNull(entitiy);
-
         try {
             String sql = "INSERT INTO `courses` ( `name`, `enddate`, `hours`, `begindate`, `description`,  `coursetype`) VALUES (?,?,?,?,?,?)";
 
             PreparedStatement preparedStatement = con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1,entitiy.getName());
-            preparedStatement.setString(2,entitiy.getDescription());
+            preparedStatement.setString(5,entitiy.getDescription());
             preparedStatement.setInt(3,entitiy.getHours());
             preparedStatement.setDate(4,entitiy.getBeginDate());
-            preparedStatement.setDate(5,entitiy.getEndDate());
+            preparedStatement.setDate(2,entitiy.getEndDate());
             preparedStatement.setString(6,entitiy.getCourseType().toString());
 
             int affectedRows = preparedStatement.executeUpdate();
@@ -94,8 +152,14 @@ public class MySqlRepository implements MyCourserepository {
             PreparedStatement preparedStatement = con.prepareStatement(countsql);
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            resultSet.next();
-            int coursecount = resultSet.getInt(1);
+            int coursecount = 0;
+            while(resultSet.next()){
+                 coursecount = resultSet.getInt(1);
+
+            }
+
+
+
             return coursecount;
         } catch (SQLException e) {
             throw new MyDatabaseException(e.getMessage());
@@ -112,26 +176,30 @@ public class MySqlRepository implements MyCourserepository {
             String sql = "SELECT * FROM `courses` WHERE `id` = ?";
 
             try {
-
-
                 PreparedStatement preparedStatement = con.prepareStatement(sql);
                 preparedStatement.setLong(1, id);
                 ResultSet resultSet = preparedStatement.executeQuery();
-                resultSet.next();
 
-                Course course = new Course(
 
-                        resultSet.getLong("id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("description"),
-                        resultSet.getInt("hours"),
-                        resultSet.getDate("beginDate"),
-                        resultSet.getDate("endDate"),
-                        CourseType.valueOf(resultSet.getString("courseType"))
-                );
-                return Optional.of(course);
+                while(resultSet.next()){
+                    Course course = new Course(
+
+                            resultSet.getLong("id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("description"),
+                            resultSet.getInt("hours"),
+                            resultSet.getDate("beginDate"),
+                            resultSet.getDate("endDate"),
+                            CourseType.valueOf(resultSet.getString("courseType"))
+                    );
+                    return Optional.of(course);
+                }
+
+                return Optional.empty();
 
             } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
@@ -158,12 +226,12 @@ public class MySqlRepository implements MyCourserepository {
                         CourseType.valueOf(resultSet.getString("courseType"))
                         )
                 );
-                return courseList;
-            }
+
+            }return courseList;
         } catch (SQLException e) {
             throw new MyDatabaseException("Database Error");
         }
-        return List.of();
+
     }
 
     @Override
